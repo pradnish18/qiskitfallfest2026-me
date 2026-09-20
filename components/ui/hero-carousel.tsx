@@ -21,6 +21,7 @@ import {
 } from 'motion/react';
 import { ExternalLink } from 'lucide-react';
 
+import { FlowButton } from '@/components/ui/flow-button';
 import { cn } from '@/lib/utils';
 
 export interface HeroCarouselItem {
@@ -292,9 +293,11 @@ export function HeroCarousel({
         >
           <motion.img
             src={active.image}
-            alt=""
+            alt={active.title.replace(/\n/g, ' ')}
             aria-hidden
             draggable={false}
+            loading="eager"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
             initial={{ scale: reduced ? 1.28 : 1.42 }}
             animate={{ scale: 1.28 }}
@@ -495,8 +498,10 @@ export function HeroCarousel({
                   clipped card still shows a face, not a forehead. */}
               <img
                 src={item.image}
-                alt=""
+                alt={item.title.replace(/\n/g, ' ')}
                 draggable={false}
+                loading={i === index ? 'eager' : 'lazy'}
+                decoding="async"
                 className="h-full w-full object-cover"
                 style={{ objectPosition: '50% 26%' }}
               />
@@ -557,49 +562,18 @@ export function HeroCarousel({
             </div>
           )}
 
-          {/* Register CTA on right: Styled in prominent beige color with left-to-right burgundy fill animation on hover */}
+          {/* Register CTA on right: Using FlowButton with beige base and burgundy hover animation */}
           {active.registrationUrl ? (
             <div className="flex items-center">
-              <a
+              <FlowButton
                 id={`hero-carousel-register-${active.id || index}`}
                 href={active.registrationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="
-                  group relative overflow-hidden inline-flex items-center gap-2.5
-                  px-4 sm:px-5 py-2 sm:py-2.5 rounded-md
-                  bg-[#F5EBE6] text-[#3A0B10]
-                  border border-[#B08D57]/40 hover:border-[#6C151E]
-                  font-sans font-bold text-xs sm:text-[12.5px] uppercase tracking-wider
-                  shadow-[0_4px_18px_rgba(0,0,0,0.45)] hover:shadow-[0_6px_22px_rgba(108,21,30,0.5)]
-                  transition-all duration-300 cursor-pointer
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5EBE6]
-                "
-              >
-                {/* Burgundy background sliding fill layer from left to right */}
-                <span
-                  aria-hidden="true"
-                  className="
-                    absolute inset-0 bg-[#6C151E]
-                    -translate-x-full group-hover:translate-x-0
-                    transition-transform duration-300 ease-out pointer-events-none
-                  "
-                />
-
-                {/* Foreground label */}
-                <span className="relative z-10 transition-colors duration-300 group-hover:text-[#F5EBE6] whitespace-nowrap">
-                  {active.registrationLabel || 'Register Now'}
-                </span>
-
-                {/* Foreground icon with slight hover micro-interaction */}
-                <ExternalLink
-                  className="
-                    relative z-10 w-3.5 h-3.5 text-[#3A0B10]
-                    transition-all duration-300 group-hover:text-[#F5EBE6]
-                    group-hover:translate-x-0.5 group-hover:-translate-y-0.5 shrink-0
-                  "
-                />
-              </a>
+                text={active.registrationLabel || 'Register Now'}
+                variant="beige-burgundy"
+                className="font-sans font-bold uppercase tracking-wider text-xs sm:text-[13px]"
+              />
             </div>
           ) : null}
         </div>

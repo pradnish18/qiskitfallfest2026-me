@@ -1,13 +1,42 @@
 'use client';
 
 import * as React from 'react';
+import dynamic from 'next/dynamic';
 import { ExperienceHero } from '@/components/pages/experience/ExperienceHero';
 import { EcosystemStrip } from '@/components/pages/experience/EcosystemStrip';
 import { LearnSection } from '@/components/pages/experience/LearnSection';
-import { BuildSection } from '@/components/pages/experience/BuildSection';
-import { ConnectSection } from '@/components/pages/experience/ConnectSection';
 import { ExperienceSectionDivider } from '@/components/pages/experience/ExperienceSectionDivider';
 import { Footer } from '@/components/shared/Footer';
+
+// Dynamically load below-the-fold Track 02 (Build) and Track 03 (Connect)
+// to reduce initial bundle execution and accelerate page entry
+const BuildSection = dynamic(
+  () => import('@/components/pages/experience/BuildSection').then((mod) => mod.BuildSection),
+  {
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="w-full min-h-[90vh] bg-[#16171B] flex items-center justify-center text-[#F5EBE6]/20 font-mono text-xs tracking-widest uppercase"
+      >
+        02 BUILD TRACK
+      </div>
+    ),
+  }
+);
+
+const ConnectSection = dynamic(
+  () => import('@/components/pages/experience/ConnectSection').then((mod) => mod.ConnectSection),
+  {
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="w-full min-h-[90vh] bg-[#16171B] flex items-center justify-center text-[#F5EBE6]/20 font-mono text-xs tracking-widest uppercase"
+      >
+        03 CONNECT TRACK
+      </div>
+    ),
+  }
+);
 
 export default function ExperiencePageContent() {
   return (

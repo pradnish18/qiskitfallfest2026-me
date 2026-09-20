@@ -10,8 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .map((route) => ({
       url: `${baseUrl}${route.path === '/' ? '' : route.path}`,
       lastModified: new Date(),
-      changeFrequency: (route.path === '/' ? 'daily' : 'weekly') as 'daily' | 'weekly',
-      priority: route.path === '/' ? 1.0 : 0.8,
+      changeFrequency: (route.path === '/' || route.path === '/experience' ? 'daily' : 'weekly') as 'daily' | 'weekly',
+      priority: route.path === '/' ? 1.0 : route.path === '/experience' ? 0.9 : 0.8,
     }));
 
   return liveRoutes;

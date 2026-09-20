@@ -17,6 +17,16 @@ export function ExperienceHero() {
 
   // Dynamically calibrate sphere scale relative to viewport dimensions so it commands the space
   const [sphereScale, setSphereScale] = React.useState(72);
+  // Defer heavy WebGL canvas initialization slightly so initial DOM, typography, and controls paint instantly
+  const [isCanvasMounted, setIsCanvasMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    // Mount WebGL sphere on next idle/frame cycle to prevent route transition stalls
+    const rafId = requestAnimationFrame(() => {
+      setIsCanvasMounted(true);
+    });
+    return () => cancelAnimationFrame(rafId);
+  }, []);
 
   React.useEffect(() => {
     const updateScale = () => {
@@ -441,17 +451,24 @@ export function ExperienceHero() {
               "
               aria-hidden="true"
             >
-              <PlasmaRing
-                background="transparent"
-                colors={PLASMA_HERO_COLORS}
-                density={120}
-                speed={85}
-                waveHeight={22}
-                centerOpacity={92}
-                scale={sphereScale}
-                dragSensitivity={100}
-                className="w-full h-full"
-              />
+              {isCanvasMounted ? (
+                <PlasmaRing
+                  background="transparent"
+                  colors={PLASMA_HERO_COLORS}
+                  density={120}
+                  speed={85}
+                  waveHeight={22}
+                  centerOpacity={92}
+                  scale={sphereScale}
+                  dragSensitivity={100}
+                  className="w-full h-full"
+                />
+              ) : (
+                <div
+                  aria-hidden="true"
+                  className="w-3/4 h-3/4 rounded-full bg-[radial-gradient(circle,rgba(108,21,30,0.14)_0%,transparent_70%)] animate-pulse"
+                />
+              )}
             </motion.div>
           </div>
         </div>
