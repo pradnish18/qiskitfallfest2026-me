@@ -15,6 +15,28 @@ export function ExperienceHero() {
   const [isVideoModalOpen, setIsVideoModalOpen] = React.useState(false);
   const shouldReduceMotion = useReducedMotion();
 
+  // Dynamically calibrate sphere scale relative to viewport dimensions so it commands the space
+  const [sphereScale, setSphereScale] = React.useState(72);
+
+  React.useEffect(() => {
+    const updateScale = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      if (w < 640) {
+        setSphereScale(62);
+      } else if (w < 1024) {
+        setSphereScale(68);
+      } else if (w < 1440 || h < 820) {
+        setSphereScale(72);
+      } else {
+        setSphereScale(76);
+      }
+    };
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+
   // Close modal on Escape key and restore body scrolling
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -35,9 +57,12 @@ export function ExperienceHero() {
   }, [isVideoModalOpen]);
 
   const handleScrollToExplore = () => {
-    const target = document.getElementById('experience-future-content');
+    const target =
+      document.getElementById('experience-ecosystem-strip') ||
+      document.getElementById('section-learn') ||
+      document.getElementById('01-learn');
     if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
       window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' });
     }
@@ -51,7 +76,8 @@ export function ExperienceHero() {
         relative isolate w-full overflow-hidden
         bg-[#F5F3F0] text-[#16171B]
         dark:bg-[#16171B] dark:text-[#F5F3F0]
-        min-h-[calc(100svh-90px)]
+        min-h-[calc(100dvh-78px)] sm:min-h-[calc(100dvh-84px)] lg:h-[calc(100dvh-84px)] xl:h-[calc(100dvh-90px)]
+        lg:max-h-[calc(100dvh-84px)] xl:max-h-[calc(100dvh-90px)]
         flex flex-col justify-center
         transition-colors duration-300
       "
@@ -76,56 +102,56 @@ export function ExperienceHero() {
           className="
             absolute
             right-[-10%] top-[5%]
-            h-[420px] w-[420px]
-            sm:h-[600px] sm:w-[600px]
-            lg:right-[8%] lg:top-[8%]
-            lg:h-[820px] lg:w-[820px]
+            h-[400px] w-[400px]
+            sm:h-[520px] sm:w-[520px]
+            lg:right-[5%] lg:top-[5%]
+            lg:h-[min(680px,calc(100dvh-120px))] lg:w-[min(680px,calc(100dvh-120px))]
             rounded-full
-            bg-[radial-gradient(circle,rgba(108,21,30,0.12)_0%,rgba(58,11,16,0.04)_45%,transparent_70%)]
-            dark:bg-[radial-gradient(circle,rgba(240,120,132,0.14)_0%,rgba(108,21,30,0.07)_50%,transparent_70%)]
+            bg-[radial-gradient(circle,rgba(108,21,30,0.12)_0%,rgba(58,11,16,0.03)_45%,transparent_70%)]
+            dark:bg-[radial-gradient(circle,rgba(240,120,132,0.14)_0%,rgba(108,21,30,0.06)_50%,transparent_70%)]
             blur-3xl
           "
         />
       </div>
 
-      {/* Main Content Container */}
+      {/* Main Content Container: calibrated vertical padding so hero fits 100% in a single screen */}
       <div
         className="
-          relative mx-auto w-full max-w-[1780px]
-          px-5 sm:px-8 md:px-12 lg:px-16 xl:px-20 2xl:px-24
-          pt-6 pb-12 sm:pt-8 sm:pb-16 lg:pt-10 lg:pb-14
-          flex-1 flex items-center
+          relative mx-auto w-full max-w-[1600px]
+          px-5 sm:px-8 md:px-10 lg:px-12 xl:px-16
+          py-2 sm:py-4 lg:py-2 xl:py-3
+          flex-1 flex items-center justify-center
         "
       >
         <div
           className="
             w-full grid grid-cols-1 lg:grid-cols-12
             items-center
-            gap-8 sm:gap-10 lg:gap-6 xl:gap-10 2xl:gap-12
+            gap-6 sm:gap-8 lg:gap-6 xl:gap-8
           "
         >
           {/* =========================================================
-              LEFT COLUMN: EDITORIAL CONTENT & TYPOGRAPHY
+              LEFT COLUMN: EDITORIAL CONTENT & TYPOGRAPHY (5 cols)
           ========================================================== */}
           <div
             className="
-              lg:col-span-6 xl:col-span-5
+              lg:col-span-5 xl:col-span-5
               flex flex-col justify-center
               z-10
             "
           >
             {/* Eyebrow: EXPERIENCES + Burgundy Horizontal Rule */}
             <motion.div
-              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
+              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex items-center gap-3.5 mb-4 sm:mb-6"
+              transition={{ duration: 0.45, delay: 0.08 }}
+              className="flex items-center gap-3 mb-2 sm:mb-2.5"
             >
               <span
                 className="
-                  text-[12px] sm:text-[13px]
+                  text-[11px] sm:text-[12px]
                   font-bold uppercase
-                  tracking-[0.24em]
+                  tracking-[0.22em]
                   text-[#6C151E] dark:text-[#F07A86]
                   font-sans
                 "
@@ -134,7 +160,7 @@ export function ExperienceHero() {
               </span>
               <span
                 className="
-                  w-12 sm:w-16 h-[1.5px]
+                  w-10 sm:w-14 h-[1.5px]
                   bg-[#6C151E] dark:bg-[#F07A86]
                   opacity-90
                 "
@@ -149,7 +175,7 @@ export function ExperienceHero() {
                 font-serif font-bold
                 leading-[0.92] sm:leading-[0.90]
                 tracking-[-0.035em]
-                text-[clamp(44px,6.8vw,92px)]
+                text-[clamp(34px,4.4vw,66px)] 2xl:text-[72px]
                 text-[#3A0B10] dark:text-[#FFF4F2]
                 m-0
               "
@@ -159,7 +185,7 @@ export function ExperienceHero() {
                   className="inline-block"
                   initial={{ y: shouldReduceMotion ? 0 : '100%', opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.7, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.6, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
                 >
                   Learn.
                 </motion.span>
@@ -169,7 +195,7 @@ export function ExperienceHero() {
                   className="inline-block whitespace-normal sm:whitespace-nowrap"
                   initial={{ y: shouldReduceMotion ? 0 : '100%', opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.7, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.6, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 >
                   Build. Connect.
                 </motion.span>
@@ -178,14 +204,14 @@ export function ExperienceHero() {
 
             {/* Subheadline: Three paths. A global quantum community. */}
             <motion.p
-              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 14 }}
+              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.38 }}
+              transition={{ duration: 0.45, delay: 0.3 }}
               className="
-                mt-4 sm:mt-6
-                text-[18px] sm:text-[20px] lg:text-[22px]
+                mt-2 sm:mt-3
+                text-[16px] sm:text-[17.5px] lg:text-[18.5px] xl:text-[20px]
                 font-semibold font-sans
-                leading-[1.3]
+                leading-[1.25]
                 tracking-[-0.015em]
                 text-[#16171B] dark:text-[#F5F3F0]
               "
@@ -195,14 +221,14 @@ export function ExperienceHero() {
 
             {/* Body Description */}
             <motion.p
-              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 14 }}
+              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.48 }}
+              transition={{ duration: 0.45, delay: 0.38 }}
               className="
-                mt-3 sm:mt-4
-                max-w-[490px]
-                text-[14.5px] sm:text-[15.5px] lg:text-[16px]
-                leading-[1.65]
+                mt-1.5 sm:mt-2
+                max-w-[440px]
+                text-[13px] sm:text-[13.5px] lg:text-[14px]
+                leading-[1.55]
                 font-normal font-sans
                 text-[#5A4D4B] dark:text-[#C7BCB9]
               "
@@ -213,23 +239,23 @@ export function ExperienceHero() {
 
             {/* Hero Actions Row: Watch Trailer + Scroll to explore */}
             <motion.div
-              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 14 }}
+              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.58 }}
+              transition={{ duration: 0.45, delay: 0.46 }}
               className="
-                mt-7 sm:mt-10
+                mt-4 sm:mt-5 lg:mt-5 xl:mt-6
                 flex flex-wrap items-center
-                gap-5 sm:gap-8
+                gap-4 sm:gap-6
               "
             >
               {/* Watch Trailer Group with Thin Vertical Rule */}
-              <div className="flex items-center gap-3.5 border-l-2 border-[#6C151E]/25 dark:border-[#F07A86]/30 pl-3.5 sm:pl-4">
+              <div className="flex items-center gap-3 border-l-2 border-[#6C151E]/25 dark:border-[#F07A86]/30 pl-3 sm:pl-3.5">
                 <button
                   type="button"
                   onClick={() => setIsVideoModalOpen(true)}
                   aria-label="Watch Qiskit Fall Fest 2026 Trailer (2 minutes)"
                   className="
-                    group relative flex h-10 w-10 sm:h-11 sm:w-11
+                    group relative flex h-9 w-9 sm:h-10 sm:w-10
                     items-center justify-center
                     rounded-full
                     border border-[#6C151E] dark:border-[#F07A86]
@@ -241,7 +267,7 @@ export function ExperienceHero() {
                   "
                 >
                   <Play
-                    size={14}
+                    size={13}
                     className="
                       ml-0.5 fill-[#6C151E] text-[#6C151E]
                       group-hover:fill-white group-hover:text-white
@@ -256,7 +282,7 @@ export function ExperienceHero() {
                     type="button"
                     onClick={() => setIsVideoModalOpen(true)}
                     className="
-                      text-[14.5px] sm:text-[15px] font-bold font-sans
+                      text-[13.5px] sm:text-[14px] font-bold font-sans
                       text-[#16171B] dark:text-[#FFF4F2]
                       hover:text-[#6C151E] dark:hover:text-[#F07A86]
                       transition-colors text-left cursor-pointer
@@ -265,7 +291,7 @@ export function ExperienceHero() {
                   >
                     Watch Trailer
                   </button>
-                  <span className="text-[12px] text-[#7A6D6B] dark:text-[#A89B99] font-mono mt-0.5">
+                  <span className="text-[11px] text-[#7A6D6B] dark:text-[#A89B99] font-mono mt-0.5">
                     2 min
                   </span>
                 </div>
@@ -273,7 +299,7 @@ export function ExperienceHero() {
 
               {/* Vertical Divider between actions on larger screens */}
               <div
-                className="hidden sm:block h-8 w-[1px] bg-[#6C151E]/15 dark:bg-white/15"
+                className="hidden sm:block h-7 w-[1px] bg-[#6C151E]/15 dark:bg-white/15"
                 aria-hidden="true"
               />
 
@@ -283,7 +309,7 @@ export function ExperienceHero() {
                 onClick={handleScrollToExplore}
                 aria-label="Scroll to explore Experience section"
                 className="
-                  group inline-flex items-center gap-3
+                  group inline-flex items-center gap-2.5
                   text-[#3D3032] dark:text-[#D5C8C6]
                   hover:text-[#6C151E] dark:hover:text-[#F07A86]
                   focus-visible:ring-2 focus-visible:ring-[#6C151E] dark:focus-visible:ring-[#F07A86]
@@ -294,10 +320,10 @@ export function ExperienceHero() {
                 {/* Mouse Outline Pill with Animated Dot */}
                 <div
                   className="
-                    w-[18px] h-[28px] rounded-full
+                    w-[16px] h-[25px] rounded-full
                     border border-[#521018]/60 dark:border-white/50
                     group-hover:border-[#6C151E] dark:group-hover:border-[#F07A86]
-                    flex justify-center pt-1.5
+                    flex justify-center pt-1
                     transition-colors
                   "
                   aria-hidden="true"
@@ -311,7 +337,7 @@ export function ExperienceHero() {
                     "
                   />
                 </div>
-                <span className="text-[13.5px] sm:text-[14px] font-medium font-sans tracking-tight">
+                <span className="text-[13px] sm:text-[13.5px] font-medium font-sans tracking-tight">
                   Scroll to explore
                 </span>
               </button>
@@ -319,33 +345,38 @@ export function ExperienceHero() {
           </div>
 
           {/* =========================================================
-              RIGHT COLUMN: INTERACTIVE PLASMA RING & EDITORIAL ANNOTATIONS
+              RIGHT COLUMN: INTERACTIVE PLASMA RING & EDITORIAL ANNOTATIONS (7 cols)
+              Calibrated with responsive explicit dimensions so the sphere scales
+              with screen size while strictly fitting within the single-screen viewport.
           ========================================================== */}
           <div
             className="
-              lg:col-span-6 xl:col-span-7
+              lg:col-span-7 xl:col-span-7
               relative
               flex items-center justify-center
               w-full
-              h-[360px] sm:h-[460px] md:h-[540px] lg:h-[620px] xl:h-[700px] 2xl:h-[760px]
+              h-[320px] sm:h-[420px] md:h-[480px]
+              lg:h-[min(580px,calc(100dvh-130px))]
+              xl:h-[min(660px,calc(100dvh-140px))]
+              2xl:h-[min(740px,calc(100dvh-150px))]
             "
           >
             {/* Upper-Right Editorial Text Block (PEOPLE, IDEAS, etc.) */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.65 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
               className="
                 pointer-events-none absolute
-                top-2 sm:top-6 right-0 sm:right-2 lg:right-2 xl:right-4
+                top-0 sm:top-1 lg:top-2 right-0 sm:right-1 lg:right-2
                 z-20 flex flex-col items-start select-none
               "
               aria-label="People, Ideas, Technology, A Brighter Tomorrow"
             >
               <div
                 className="
-                  text-[10.5px] sm:text-[11px] lg:text-[11.5px] font-mono
-                  tracking-[0.20em] uppercase leading-[1.65]
+                  text-[9.5px] sm:text-[10px] lg:text-[11px] font-mono
+                  tracking-[0.18em] uppercase leading-[1.6]
                   text-[#3D3032] dark:text-[#E2D6D4] font-medium
                 "
               >
@@ -356,7 +387,7 @@ export function ExperienceHero() {
                 <div>TOMORROW</div>
               </div>
               <div
-                className="mt-2.5 w-9 sm:w-11 h-[2px] bg-[#6C151E] dark:bg-[#F07A86]"
+                className="mt-1.5 w-7 sm:w-9 h-[1.5px] bg-[#6C151E] dark:bg-[#F07A86]"
                 aria-hidden="true"
               />
             </motion.div>
@@ -365,18 +396,18 @@ export function ExperienceHero() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.75 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
               className="
                 pointer-events-none absolute
-                bottom-2 sm:bottom-6 right-0 sm:right-2 lg:right-2 xl:right-4
+                bottom-0 sm:bottom-1 lg:bottom-2 right-0 sm:right-1 lg:right-2
                 z-20 flex flex-col items-start select-none
               "
               aria-label="A Decade of Progress, A Brighter Quantum Future"
             >
               <div
                 className="
-                  text-[10px] sm:text-[10.5px] lg:text-[11px] font-mono
-                  tracking-[0.18em] uppercase leading-[1.65]
+                  text-[9px] sm:text-[9.5px] lg:text-[10px] font-mono
+                  tracking-[0.16em] uppercase leading-[1.6]
                   text-[#7A6D6B] dark:text-[#A89B99]
                 "
               >
@@ -387,14 +418,25 @@ export function ExperienceHero() {
               </div>
             </motion.div>
 
-            {/* Central Interactive PlasmaRing Visual Container */}
+            {/* Central Interactive PlasmaRing Visual Container:
+                Takes generous responsive aspect-square bounds so the WebGL sphere
+                renders in true circular aspect ratio and commands the right side. */}
             <motion.div
               initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="
                 relative w-full h-full
-                max-w-[760px] max-h-[760px]
+                aspect-square
+                max-w-[320px] max-h-[320px]
+                sm:max-w-[420px] sm:max-h-[420px]
+                md:max-w-[480px] md:max-h-[480px]
+                lg:max-w-[min(580px,calc(100dvh-130px))]
+                lg:max-h-[min(580px,calc(100dvh-130px))]
+                xl:max-w-[min(660px,calc(100dvh-140px))]
+                xl:max-h-[min(660px,calc(100dvh-140px))]
+                2xl:max-w-[min(740px,calc(100dvh-150px))]
+                2xl:max-h-[min(740px,calc(100dvh-150px))]
                 flex items-center justify-center
               "
               aria-hidden="true"
@@ -406,7 +448,7 @@ export function ExperienceHero() {
                 speed={85}
                 waveHeight={22}
                 centerOpacity={92}
-                scale={38}
+                scale={sphereScale}
                 dragSensitivity={100}
                 className="w-full h-full"
               />

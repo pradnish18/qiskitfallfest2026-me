@@ -5,28 +5,24 @@ import Image from 'next/image';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 
-interface EcosystemStripProps {
-  /**
-   * Optional callback for when the CTA is clicked.
-   * Reserved for future smooth-scroll navigation to the Learn section.
-   */
-  onExploreClick?: () => void;
-}
-
-export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
+/**
+ * Editorial Ecosystem & Partner Strip
+ * Positioned cleanly between the Experience Hero and Track 01 (Learn).
+ * Styled in the application's signature light Ivory palette (#F5F3F0), creating
+ * a crisp, high-contrast separation that prevents any color mixing with the
+ * dark event section below.
+ */
+export function EcosystemStrip() {
   const shouldReduceMotion = useReducedMotion();
 
-  const handleCtaClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // Current phase: CTA is interactive but not yet linked to Learn section.
-    // Clean interaction boundary reserved for future Learn section smooth navigation.
-    if (onExploreClick) {
-      onExploreClick();
+  const handleCtaClick = () => {
+    const learnSection = document.getElementById('section-learn');
+    if (learnSection) {
+      learnSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
-      // If Learn section is implemented later with id="section-02-learn",
-      // it will smoothly scroll to it if found; otherwise keeps a clean no-op.
-      const learnTarget = document.getElementById('section-02-learn');
+      const learnTarget = document.getElementById('01-learn');
       if (learnTarget) {
-        learnTarget.scrollIntoView({ behavior: 'smooth' });
+        learnTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   };
@@ -37,19 +33,20 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
       aria-label="Quantum Ecosystem Partners and Editorial Mission"
       className="
         relative z-10 w-full overflow-hidden
-        bg-gradient-to-r from-[#3A0B10] via-[#4A0E15] to-[#3A0B10]
-        border-y border-[#521018] border-opacity-70 dark:border-white/10
-        text-[#F5F3F0]
+        bg-[#F5F3F0] dark:bg-[#1C1E24]
+        border-y border-[#DDD8CF] dark:border-white/10
+        text-[#16171B] dark:text-[#F5F3F0]
+        transition-colors duration-300
       "
     >
-      {/* Subtle atmospheric ambient glow matching Fall Fest editorial aesthetic */}
+      {/* Subtle warm ambient lighting texture */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(176,141,87,0.06),transparent_80%)]"
       />
 
       {/* Main Container */}
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-3.5 sm:py-4">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-3 sm:py-3.5">
         {/* ============================================================ */}
         {/* DESKTOP & WIDE VIEWPORTS (Single Horizontal Row Layout)     */}
         {/* ============================================================ */}
@@ -66,7 +63,7 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
             <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
               <span
                 id="ecosystem-powered-by-label"
-                className="text-[10px] xl:text-[11px] font-semibold tracking-[0.22em] text-[#C7C8CC] uppercase select-none font-mono"
+                className="text-[10px] xl:text-[11px] font-semibold tracking-[0.20em] text-[#6E7076] dark:text-[#C7C8CC] uppercase select-none font-sans"
               >
                 POWERED BY
               </span>
@@ -76,7 +73,7 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
                   alt="IBM Quantum"
                   width={196}
                   height={28}
-                  className="h-6 xl:h-7 w-auto object-contain select-none"
+                  className="h-6 xl:h-7 w-auto object-contain select-none brightness-0 opacity-90 dark:brightness-100 dark:opacity-100"
                   priority
                 />
               </div>
@@ -85,7 +82,7 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
             {/* Vertical Divider 1 */}
             <div
               aria-hidden="true"
-              className="h-7 xl:h-8 w-px bg-[rgba(245,243,240,0.28)] mx-5 xl:mx-7 flex-shrink-0"
+              className="h-7 xl:h-8 w-px bg-[#DDD8CF] dark:bg-white/20 mx-5 xl:mx-7 flex-shrink-0"
             />
 
             {/* GROUP 2: Qiskit Branding (Emblem + Logotype) */}
@@ -96,11 +93,11 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
                   alt="Qiskit logo"
                   width={32}
                   height={32}
-                  className="h-6 w-6 xl:h-7 xl:w-7 object-contain select-none"
+                  className="h-6 w-6 xl:h-7 xl:w-7 object-contain select-none brightness-0 opacity-85 dark:brightness-100 dark:opacity-100"
                   priority
                 />
               </div>
-              <span className="text-[17px] xl:text-[19px] font-medium tracking-tight text-[#F5F3F0] select-none">
+              <span className="text-[17px] xl:text-[19px] font-medium tracking-tight text-[#16171B] dark:text-[#F5F3F0] select-none font-sans">
                 Qiskit
               </span>
             </div>
@@ -108,17 +105,17 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
             {/* Vertical Divider 2 */}
             <div
               aria-hidden="true"
-              className="h-7 xl:h-8 w-px bg-[rgba(245,243,240,0.28)] mx-5 xl:mx-7 flex-shrink-0"
+              className="h-7 xl:h-8 w-px bg-[#DDD8CF] dark:bg-white/20 mx-5 xl:mx-7 flex-shrink-0"
             />
 
             {/* GROUP 3: IBM Quantum Editorial Quote */}
             <div className="flex items-center flex-shrink-0">
-              <p className="text-xs xl:text-[13px] text-[#F5F3F0] font-normal leading-[1.3] select-none">
+              <p className="text-xs xl:text-[13px] text-[#16171B] dark:text-[#F5F3F0] font-serif font-normal leading-[1.3] select-none">
                 &ldquo;Open science. Real impact.
                 <br />
                 A global movement.&rdquo;
               </p>
-              <span className="text-[11px] xl:text-xs text-[#C7C8CC] font-light tracking-wide ml-3 xl:ml-4 whitespace-nowrap select-none">
+              <span className="text-[11px] xl:text-xs text-[#6E7076] dark:text-[#C7C8CC] font-sans font-medium tracking-wide ml-3 xl:ml-4 whitespace-nowrap select-none">
                 — IBM Quantum
               </span>
             </div>
@@ -128,7 +125,7 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
           <div className="flex items-center flex-shrink-0 pl-6">
             <div
               aria-hidden="true"
-              className="h-7 xl:h-8 w-px bg-[rgba(245,243,240,0.28)] mr-6 xl:mr-8 flex-shrink-0"
+              className="h-7 xl:h-8 w-px bg-[#DDD8CF] dark:bg-white/20 mr-6 xl:mr-8 flex-shrink-0"
             />
 
             <button
@@ -138,19 +135,22 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
               data-future-target="learn-section"
               className="
                 group relative inline-flex items-center gap-2.5 sm:gap-3
-                px-3 py-1.5 -mx-3 -my-1.5
-                text-xs xl:text-sm font-medium text-[#F5F3F0]
-                hover:text-white transition-colors duration-200
+                px-4 py-1.5 rounded-full
+                bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15
+                border border-[#DDD8CF] dark:border-white/15
+                shadow-[0_2px_8px_rgba(0,0,0,0.04)]
+                text-xs xl:text-sm font-sans font-medium text-[#16171B] dark:text-[#F5F3F0]
+                hover:text-[#6C151E] dark:hover:text-white
+                transition-all duration-200
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B08D57]
-                focus-visible:ring-offset-2 focus-visible:ring-offset-[#3A0B10]
-                rounded cursor-pointer
+                cursor-pointer
               "
               aria-label="Explore the Qiskit ecosystem"
             >
               <span className="tracking-wide">Explore the Qiskit ecosystem</span>
               <ArrowRight
                 aria-hidden="true"
-                className="w-4 h-4 text-[#F5F3F0] group-hover:text-white transition-transform duration-200 ease-out group-hover:translate-x-1.5 flex-shrink-0"
+                className="w-4 h-4 text-[#B08D57] group-hover:text-[#6C151E] dark:group-hover:text-white transition-transform duration-200 ease-out group-hover:translate-x-1.5 flex-shrink-0"
               />
             </button>
           </div>
@@ -171,7 +171,7 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
             <div className="flex items-center gap-4">
               {/* Group 1: Powered by + IBM */}
               <div className="flex items-center gap-2.5">
-                <span className="text-[10px] font-semibold tracking-[0.2em] text-[#C7C8CC] uppercase font-mono">
+                <span className="text-[10px] font-semibold tracking-[0.2em] text-[#6E7076] dark:text-[#C7C8CC] uppercase font-sans">
                   POWERED BY
                 </span>
                 <Image
@@ -179,14 +179,14 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
                   alt="IBM Quantum"
                   width={154}
                   height={22}
-                  className="h-5 w-auto object-contain"
+                  className="h-5 w-auto object-contain brightness-0 opacity-90 dark:brightness-100 dark:opacity-100"
                 />
               </div>
 
               {/* Divider */}
               <div
                 aria-hidden="true"
-                className="h-6 w-px bg-[rgba(245,243,240,0.28)]"
+                className="h-6 w-px bg-[#DDD8CF] dark:bg-white/20"
               />
 
               {/* Group 2: Qiskit */}
@@ -196,9 +196,9 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
                   alt="Qiskit logo"
                   width={24}
                   height={24}
-                  className="h-5 w-5 object-contain"
+                  className="h-5 w-5 object-contain brightness-0 opacity-85 dark:brightness-100 dark:opacity-100"
                 />
-                <span className="text-base font-medium tracking-tight text-[#F5F3F0]">
+                <span className="text-base font-medium tracking-tight text-[#16171B] dark:text-[#F5F3F0] font-sans">
                   Qiskit
                 </span>
               </div>
@@ -212,28 +212,31 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
               data-future-target="learn-section"
               className="
                 group inline-flex items-center gap-2
-                px-2.5 py-1 text-xs font-medium text-[#F5F3F0]
-                hover:text-white transition-colors duration-200
+                px-3 py-1.5 rounded-full
+                bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15
+                border border-[#DDD8CF] dark:border-white/15
+                text-xs font-sans font-medium text-[#16171B] dark:text-[#F5F3F0]
+                hover:text-[#6C151E] dark:hover:text-white
+                transition-colors duration-200
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B08D57]
-                focus-visible:ring-offset-2 focus-visible:ring-offset-[#3A0B10]
-                rounded cursor-pointer
+                cursor-pointer
               "
               aria-label="Explore the Qiskit ecosystem"
             >
               <span className="tracking-wide">Explore the Qiskit ecosystem</span>
               <ArrowRight
                 aria-hidden="true"
-                className="w-3.5 h-3.5 text-[#F5F3F0] group-hover:text-white transition-transform duration-200 group-hover:translate-x-1"
+                className="w-3.5 h-3.5 text-[#B08D57] group-hover:text-[#6C151E] dark:group-hover:text-white transition-transform duration-200 group-hover:translate-x-1"
               />
             </button>
           </div>
 
           {/* Row 2: Quote */}
-          <div className="flex items-center justify-start pt-1 border-t border-[rgba(245,243,240,0.12)]">
-            <p className="text-xs text-[#F5F3F0] font-normal leading-snug">
+          <div className="flex items-center justify-start pt-1.5 border-t border-[#DDD8CF] dark:border-white/10">
+            <p className="text-xs text-[#16171B] dark:text-[#F5F3F0] font-serif font-normal leading-snug">
               &ldquo;Open science. Real impact. A global movement.&rdquo;
             </p>
-            <span className="text-[11px] text-[#C7C8CC] font-light tracking-wide ml-3">
+            <span className="text-[11px] text-[#6E7076] dark:text-[#C7C8CC] font-sans font-medium tracking-wide ml-3">
               — IBM Quantum
             </span>
           </div>
@@ -247,12 +250,12 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
           whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="flex md:hidden flex-col gap-3 w-full py-1"
+          className="flex md:hidden flex-col gap-2.5 w-full py-1"
         >
           {/* Row 1: Logos (POWERED BY + IBM Quantum & Qiskit) */}
           <div className="flex items-center justify-between flex-wrap gap-2.5">
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-semibold tracking-[0.18em] text-[#C7C8CC] uppercase font-mono">
+              <span className="text-[9px] font-semibold tracking-[0.18em] text-[#6E7076] dark:text-[#C7C8CC] uppercase font-sans">
                 POWERED BY
               </span>
               <Image
@@ -260,7 +263,7 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
                 alt="IBM Quantum"
                 width={130}
                 height={20}
-                className="h-4.5 w-auto object-contain"
+                className="h-4.5 w-auto object-contain brightness-0 opacity-90 dark:brightness-100 dark:opacity-100"
               />
             </div>
 
@@ -270,19 +273,19 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
                 alt="Qiskit logo"
                 width={20}
                 height={20}
-                className="h-4.5 w-4.5 object-contain"
+                className="h-4.5 w-4.5 object-contain brightness-0 opacity-85 dark:brightness-100 dark:opacity-100"
               />
-              <span className="text-sm font-medium tracking-tight text-[#F5F3F0]">
+              <span className="text-sm font-medium tracking-tight text-[#16171B] dark:text-[#F5F3F0] font-sans">
                 Qiskit
               </span>
             </div>
           </div>
 
           {/* Row 2: Quote */}
-          <div className="pt-2 border-t border-[rgba(245,243,240,0.14)]">
-            <p className="text-[11px] text-[#F5F3F0] font-normal leading-tight">
+          <div className="pt-2 border-t border-[#DDD8CF] dark:border-white/10">
+            <p className="text-[11px] text-[#16171B] dark:text-[#F5F3F0] font-serif font-normal leading-tight">
               &ldquo;Open science. Real impact. A global movement.&rdquo;{' '}
-              <span className="text-[10px] text-[#C7C8CC] font-light italic whitespace-nowrap">
+              <span className="text-[10px] text-[#6E7076] dark:text-[#C7C8CC] font-sans font-medium whitespace-nowrap">
                 — IBM Quantum
               </span>
             </p>
@@ -297,9 +300,10 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
               data-future-target="learn-section"
               className="
                 group w-full min-h-[44px] flex items-center justify-between
-                px-3.5 py-2.5 rounded bg-black/20 hover:bg-black/30 active:bg-black/40
-                border border-white/10
-                text-xs font-medium text-[#F5F3F0]
+                px-4 py-2.5 rounded-lg bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15
+                border border-[#DDD8CF] dark:border-white/15
+                shadow-sm
+                text-xs font-sans font-medium text-[#16171B] dark:text-[#F5F3F0]
                 transition-colors duration-150 cursor-pointer
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B08D57]
               "
@@ -308,7 +312,7 @@ export function EcosystemStrip({ onExploreClick }: EcosystemStripProps) {
               <span className="tracking-wide">Explore the Qiskit ecosystem</span>
               <ArrowRight
                 aria-hidden="true"
-                className="w-4 h-4 text-[#F5F3F0] group-hover:translate-x-1 transition-transform duration-200"
+                className="w-4 h-4 text-[#B08D57] group-hover:translate-x-1 transition-transform duration-200"
               />
             </button>
           </div>
