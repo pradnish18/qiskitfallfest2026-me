@@ -2,15 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-export const metadata = {
-  title: '404 — Page Not Found | Qiskit Fall Fest 2026',
-  description: "The page you're looking for doesn't exist or isn't available yet.",
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
-
 export default function NotFound() {
   return (
     <main

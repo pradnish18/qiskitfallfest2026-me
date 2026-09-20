@@ -36,7 +36,7 @@ export const ROUTE_RELEASE_CONFIG: Record<string, RouteConfig> = {
   experience: {
     path: '/experience',
     name: 'Experience',
-    status: 'coming-soon',
+    status: 'live',
     title: 'Experience | Qiskit Fall Fest 2026',
     description: 'Immersive quantum computing workshops, hackathons, and technical tracks.',
   },
