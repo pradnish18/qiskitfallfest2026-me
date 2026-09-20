@@ -69,6 +69,8 @@ export function ExperienceHero() {
   const handleScrollToExplore = () => {
     const target =
       document.getElementById('experience-ecosystem-strip') ||
+      document.getElementById('section-01-learn-container') ||
+      document.getElementById('section-01-learn') ||
       document.getElementById('section-learn') ||
       document.getElementById('01-learn');
     if (target) {

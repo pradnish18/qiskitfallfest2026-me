@@ -15,17 +15,74 @@ import { ArrowRight } from 'lucide-react';
 export function EcosystemStrip() {
   const shouldReduceMotion = useReducedMotion();
 
-  const handleCtaClick = () => {
-    const learnSection = document.getElementById('section-learn');
-    if (learnSection) {
-      learnSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      const learnTarget = document.getElementById('01-learn');
-      if (learnTarget) {
-        learnTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+  const handleCtaClick = React.useCallback(() => {
+    const learnSection =
+      document.getElementById('section-01-learn-container') ||
+      document.getElementById('section-01-learn') ||
+      document.getElementById('section-learn') ||
+      document.getElementById('01-learn');
+
+    if (!learnSection) return;
+
+    if (shouldReduceMotion) {
+      learnSection.scrollIntoView({ behavior: 'auto', block: 'start' });
+      return;
     }
-  };
+
+    // Accurately compute responsive navbar height offset
+    const getNavbarOffset = () => {
+      if (typeof window === 'undefined') return 84;
+      if (window.innerWidth >= 1280) return 90;
+      if (window.innerWidth >= 640) return 84;
+      return 78;
+    };
+
+    const navOffset = getNavbarOffset();
+    const rect = learnSection.getBoundingClientRect();
+    const targetY = Math.max(0, window.scrollY + rect.top - navOffset);
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+
+    if (Math.abs(distance) < 5) return;
+
+    // Cinematic slow scroll over 1500ms with smooth cubic ease-in-out curve
+    const duration = 1500;
+    const startTime = performance.now();
+
+    const easeInOutCubic = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    let rafId: number;
+
+    const cleanup = () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('wheel', onUserInterrupt);
+      window.removeEventListener('touchstart', onUserInterrupt);
+    };
+
+    const onUserInterrupt = () => {
+      cleanup();
+    };
+
+    window.addEventListener('wheel', onUserInterrupt, { passive: true });
+    window.addEventListener('touchstart', onUserInterrupt, { passive: true });
+
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeInOutCubic(progress);
+
+      window.scrollTo(0, startY + distance * easedProgress);
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(animateScroll);
+      } else {
+        cleanup();
+      }
+    };
+
+    rafId = requestAnimationFrame(animateScroll);
+  }, [shouldReduceMotion]);
 
   return (
     <section
