@@ -1,47 +1,48 @@
 'use client';
 
 import * as React from 'react';
-import { HeroCarousel } from '@/components/ui/hero-carousel';
-import { ExperienceHeroItem } from '@/data/experience-events';
 
-export interface ExperienceSectionProps {
+export interface ScrollLockedSectionRenderProps {
+  currentIndex: number;
+  progress: number;
+  onSelectIndex: (index: number) => void;
+  onBack: () => void;
+  onNext: () => void;
+}
+
+export interface ScrollLockedSectionProps {
   id: string;
-  sectionNumber: string;
-  sectionTitle: string;
-  sectionSubtitle?: string;
-  items: ExperienceHeroItem[];
+  ariaLabel: string;
+  itemCount: number;
   prevSectionId?: string;
   nextSectionId?: string;
-  prevLabel?: string;
-  nextLabel?: string;
+  className?: string;
+  children:
+    | React.ReactNode
+    | ((props: ScrollLockedSectionRenderProps) => React.ReactNode);
 }
 
 /**
- * Scroll-locked, viewport-pinned event showcase section.
+ * ScrollLockedSection
  *
- * 1. Fits flush below the sticky navbar so all controls, filmstrip cards,
- *    descriptions, and "Register" CTAs are 100% visible on a single screen.
- * 2. Flush edge-to-edge layout: Rectangular full-width boundaries eliminate any
- *    corner gaps or color mismatches between sections.
- * 3. Elevation & layering: With z-20 and an elevated top shadow, it slides smoothly
- *    over the light middle divider during scroll.
- * 4. Once docked below the navbar, it locks in place; continued scrolling scrubs
- *    smoothly across the sequence of events.
- * 5. After the final event, the lock releases naturally into the next chapter gap.
+ * Reusable architectural component responsible exclusively for:
+ * 1. Pinned sticky viewport stage management beneath the responsive navbar.
+ * 2. Dynamic container height calculation based on item count.
+ * 3. Passive scroll observation and index progression computation.
+ * 4. Programmatic scroll synchronization for index selection, back, and next events.
  */
-export function ExperienceSection({
+export function ScrollLockedSection({
   id,
-  sectionNumber,
-  sectionTitle,
-  items,
+  ariaLabel,
+  itemCount,
   prevSectionId,
   nextSectionId,
-  prevLabel = 'Prev',
-  nextLabel = 'Next',
-}: ExperienceSectionProps) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  className = '',
+  children,
+}: ScrollLockedSectionProps) {
+  const containerId = `${id}-container`;
   const [currentIndex, setCurrentIndex] = React.useState(0);
-  const isManualNavRef = React.useRef(false);
+  const [progress, setProgress] = React.useState(0);
 
   // Measure top offset dynamically based on responsive Navbar height:
   // mobile (<640px) = 78px, sm/md/lg (640-1279px) = 84px, xl (>=1280px) = 90px
@@ -57,9 +58,12 @@ export function ExperienceSection({
     let rafId: number;
 
     const handleScroll = () => {
-      if (!containerRef.current || isManualNavRef.current) return;
+      const container = document.getElementById(containerId);
+      if (!container || container.getAttribute('data-nav-locking') === 'true') {
+        return;
+      }
 
-      const rect = containerRef.current.getBoundingClientRect();
+      const rect = container.getBoundingClientRect();
       const topOffset = getNavbarOffset();
       const stickyHeight = window.innerHeight - topOffset;
       const containerHeight = rect.height;
@@ -72,18 +76,22 @@ export function ExperienceSection({
 
       if (scrolled <= 0) {
         setCurrentIndex(0);
+        setProgress(0);
         return;
       }
 
       if (scrolled >= maxScroll) {
-        setCurrentIndex(items.length - 1);
+        setCurrentIndex(itemCount - 1);
+        setProgress(1);
         return;
       }
 
-      const progress = scrolled / maxScroll; // strictly 0 to 1
+      const currentProgress = scrolled / maxScroll; // strictly 0 to 1
+      setProgress(currentProgress);
+
       const targetIndex = Math.min(
-        items.length - 1,
-        Math.floor(progress * items.length)
+        itemCount - 1,
+        Math.floor(currentProgress * itemCount)
       );
 
       setCurrentIndex(targetIndex);
@@ -103,25 +111,28 @@ export function ExperienceSection({
       window.removeEventListener('resize', onScroll);
       cancelAnimationFrame(rafId);
     };
-  }, [items.length, getNavbarOffset]);
+  }, [containerId, itemCount, getNavbarOffset]);
 
-  // Navigate directly to a specific card (via click or button) and sync scroll position
+  // Navigate directly to a specific card and synchronize scroll position
   const handleSelectIndex = React.useCallback(
     (targetIdx: number) => {
-      if (!containerRef.current || targetIdx < 0 || targetIdx >= items.length) {
+      if (typeof window === 'undefined' || targetIdx < 0 || targetIdx >= itemCount) {
         return;
       }
-      isManualNavRef.current = true;
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      container.setAttribute('data-nav-locking', 'true');
       setCurrentIndex(targetIdx);
 
       const topOffset = getNavbarOffset();
-      const rect = containerRef.current.getBoundingClientRect();
+      const rect = container.getBoundingClientRect();
       const containerTopInDoc = window.scrollY + rect.top;
       const stickyHeight = window.innerHeight - topOffset;
-      const maxScroll = containerRef.current.offsetHeight - stickyHeight;
+      const maxScroll = container.offsetHeight - stickyHeight;
 
       if (maxScroll > 0) {
-        const targetProgress = (targetIdx + 0.5) / items.length;
+        const targetProgress = (targetIdx + 0.5) / itemCount;
         const targetScrollY =
           containerTopInDoc - topOffset + targetProgress * maxScroll;
 
@@ -132,10 +143,11 @@ export function ExperienceSection({
       }
 
       window.setTimeout(() => {
-        isManualNavRef.current = false;
+        const c = document.getElementById(containerId);
+        if (c) c.removeAttribute('data-nav-locking');
       }, 650);
     },
-    [getNavbarOffset, items.length]
+    [containerId, getNavbarOffset, itemCount]
   );
 
   const handleBack = React.useCallback(() => {
@@ -150,7 +162,7 @@ export function ExperienceSection({
   }, [currentIndex, handleSelectIndex, prevSectionId]);
 
   const handleNext = React.useCallback(() => {
-    if (currentIndex < items.length - 1) {
+    if (currentIndex < itemCount - 1) {
       handleSelectIndex(currentIndex + 1);
     } else if (nextSectionId) {
       const nextEl = document.getElementById(nextSectionId);
@@ -158,42 +170,35 @@ export function ExperienceSection({
         nextEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
-  }, [currentIndex, handleSelectIndex, items.length, nextSectionId]);
+  }, [currentIndex, handleSelectIndex, itemCount, nextSectionId]);
 
   // Height formula: 100vh base view + 75vh scroll distance per additional card
-  // For 5 cards, total height is 100vh + 4 * 75vh = 400vh
-  const scrollContainerHeight = `${100 + (items.length - 1) * 75}vh`;
+  const scrollContainerHeight = `${100 + (itemCount - 1) * 75}vh`;
 
   return (
     <div
-      ref={containerRef}
-      id={`${id}-container`}
-      className="relative z-20 w-full"
+      id={containerId}
+      className={`relative z-20 w-full ${className}`}
       style={{ height: scrollContainerHeight }}
     >
       {/* Viewport-locked sticky stage: flush edge-to-edge layout with zero corner color gaps */}
       <section
         id={id}
-        aria-label={`${sectionNumber} — ${sectionTitle}`}
+        aria-label={ariaLabel}
         className="sticky top-[78px] sm:top-[84px] xl:top-[90px] w-full h-[calc(100vh-78px)] sm:h-[calc(100vh-84px)] xl:h-[calc(100vh-90px)] overflow-hidden bg-[#16171B] border-t border-white/15 border-b border-white/10 shadow-[0_-16px_36px_rgba(0,0,0,0.35)]"
       >
-        <HeroCarousel
-          items={items}
-          index={currentIndex}
-          onIndexChange={handleSelectIndex}
-          brand={
-            <div className="flex items-center gap-2 sm:gap-2.5 font-sans tracking-[0.14em] text-xs sm:text-sm text-[#F5F3F0]">
-              <span className="text-[#B08D57] font-semibold">{sectionNumber}</span>
-              <span className="text-[#F5F3F0]/40 font-light">—</span>
-              <span className="font-semibold text-[#F5F3F0] uppercase tracking-wider">{sectionTitle}</span>
-            </div>
-          }
-          onBack={prevSectionId || currentIndex > 0 ? handleBack : undefined}
-          backLabel={currentIndex > 0 ? 'Prev Event' : prevLabel}
-          onNext={nextSectionId || currentIndex < items.length - 1 ? handleNext : undefined}
-          nextLabel={currentIndex < items.length - 1 ? 'Next Event' : nextLabel}
-        />
+        {typeof children === 'function'
+          ? children({
+              currentIndex,
+              progress,
+              onSelectIndex: handleSelectIndex,
+              onBack: handleBack,
+              onNext: handleNext,
+            })
+          : children}
       </section>
     </div>
   );
 }
+
+export default ScrollLockedSection;

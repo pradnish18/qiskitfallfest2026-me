@@ -1,43 +1,32 @@
 'use client';
 
 import * as React from 'react';
-import dynamic from 'next/dynamic';
-import { ExperienceHero } from '@/components/pages/experience/ExperienceHero';
-import { EcosystemStrip } from '@/components/pages/experience/EcosystemStrip';
-import { LearnSection } from '@/components/pages/experience/LearnSection';
-import { ExperienceSectionDivider } from '@/components/pages/experience/ExperienceSectionDivider';
+import {
+  ExperienceHero,
+  EcosystemStrip,
+  ExperienceSection,
+  ExperienceSectionDivider,
+} from '@/components/experience';
+import {
+  LEARN_ITEMS,
+  BUILD_ITEMS,
+  CONNECT_ITEMS,
+} from '@/data/experience';
 import { Footer } from '@/components/shared/Footer';
 
-// Dynamically load below-the-fold Track 02 (Build) and Track 03 (Connect)
-// to reduce initial bundle execution and accelerate page entry
-const BuildSection = dynamic(
-  () => import('@/components/pages/experience/BuildSection').then((mod) => mod.BuildSection),
-  {
-    loading: () => (
-      <div
-        aria-hidden="true"
-        className="w-full min-h-[90vh] bg-[#16171B] flex items-center justify-center text-[#F5EBE6]/20 font-mono text-xs tracking-widest uppercase"
-      >
-        02 BUILD TRACK
-      </div>
-    ),
-  }
-);
-
-const ConnectSection = dynamic(
-  () => import('@/components/pages/experience/ConnectSection').then((mod) => mod.ConnectSection),
-  {
-    loading: () => (
-      <div
-        aria-hidden="true"
-        className="w-full min-h-[90vh] bg-[#16171B] flex items-center justify-center text-[#F5EBE6]/20 font-mono text-xs tracking-widest uppercase"
-      >
-        03 CONNECT TRACK
-      </div>
-    ),
-  }
-);
-
+/**
+ * ExperiencePageContent
+ *
+ * Responsible strictly for composing the Experience page sections in the correct order:
+ * 1. ExperienceHero
+ * 2. EcosystemStrip
+ * 3. 01 LEARN Section (Unified ExperienceSection using ScrollLockedSection & ExperienceEventGallery)
+ * 4. Editorial Transition Divider (Learn -> Build)
+ * 5. 02 BUILD Section (Unified ExperienceSection)
+ * 6. Editorial Transition Divider (Build -> Connect)
+ * 7. 03 CONNECT Section (Unified ExperienceSection)
+ * 8. Shared Footer
+ */
 export default function ExperiencePageContent() {
   return (
     <main className="relative w-full flex flex-col min-h-screen bg-[#F5F3F0] dark:bg-[#16171B] transition-colors duration-300">
@@ -48,7 +37,17 @@ export default function ExperiencePageContent() {
       <EcosystemStrip />
 
       {/* 01 — LEARN Section (Scroll-Locked Chapter) */}
-      <LearnSection />
+      <ExperienceSection
+        id="section-01-learn"
+        sectionNumber="01"
+        sectionTitle="LEARN"
+        sectionSubtitle="Educational and knowledge-oriented quantum event experiences"
+        items={LEARN_ITEMS}
+        prevSectionId="experience-ecosystem-strip"
+        nextSectionId="section-02-build"
+        prevLabel="Ecosystem"
+        nextLabel="02 Build"
+      />
 
       {/* Chapter Gap & Transition: 01 LEARN -> 02 BUILD (Light Ivory Canvas with Human Editorial Typography) */}
       <ExperienceSectionDivider
@@ -62,7 +61,17 @@ export default function ExperiencePageContent() {
       />
 
       {/* 02 — BUILD Section (Scroll-Locked Chapter: Card Sheet sliding over the middle divider) */}
-      <BuildSection />
+      <ExperienceSection
+        id="section-02-build"
+        sectionNumber="02"
+        sectionTitle="BUILD"
+        sectionSubtitle="Hands-on quantum programming, circuit labs, and development sprints"
+        items={BUILD_ITEMS}
+        prevSectionId="section-01-learn"
+        nextSectionId="section-03-connect"
+        prevLabel="01 Learn"
+        nextLabel="03 Connect"
+      />
 
       {/* Chapter Gap & Transition: 02 BUILD -> 03 CONNECT (Light Ivory Canvas with Human Editorial Typography) */}
       <ExperienceSectionDivider
@@ -76,7 +85,15 @@ export default function ExperiencePageContent() {
       />
 
       {/* 03 — CONNECT Section (Scroll-Locked Chapter: Card Sheet sliding over the middle divider) */}
-      <ConnectSection />
+      <ExperienceSection
+        id="section-03-connect"
+        sectionNumber="03"
+        sectionTitle="CONNECT"
+        sectionSubtitle="Panels, networking gala, career mentorship, and quantum summits"
+        items={CONNECT_ITEMS}
+        prevSectionId="section-02-build"
+        prevLabel="02 Build"
+      />
 
       {/* Clean boundary reserved for future Ready to Take Part / Extended content */}
       <div

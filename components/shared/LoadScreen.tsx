@@ -39,6 +39,11 @@ export function LoadScreen({
   const [progress, setProgress] =
     React.useState(0);
 
+  const onCompleteRef = React.useRef(onComplete);
+  React.useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
   React.useEffect(() => {
     if (!isVisible) return;
 
@@ -53,30 +58,24 @@ export function LoadScreen({
 
     return () => {
       document.body.style.overflow =
-        previousOverflow;
+        previousOverflow || '';
     };
   }, [isVisible]);
 
   React.useEffect(() => {
-    const MINIMUM_VISIBLE_TIME = 1900;
+    const MINIMUM_VISIBLE_TIME = 2100;
     const HARD_TIMEOUT = 3400;
-    const FINAL_HOLD = 280;
+    const FINAL_HOLD = 320;
     const FADE_DURATION = 520;
 
     const startedAt = performance.now();
 
-    let cancelled = false;
+    let isCancelled = false;
     let loadedCount = 0;
+    const activeTimers: number[] = [];
 
     const updateProgress = () => {
       loadedCount += 1;
-
-      if (!cancelled) {
-        setProgress(
-          loadedCount /
-            CRITICAL_ASSETS.length
-        );
-      }
     };
 
     const preloadPromises =
@@ -85,15 +84,21 @@ export function LoadScreen({
           new Promise<void>((resolve) => {
             const image = new Image();
 
+            let finished = false;
             const finish = () => {
+              if (finished) return;
+              finished = true;
               updateProgress();
               resolve();
             };
 
             image.onload = finish;
             image.onerror = finish;
-
             image.src = src;
+
+            if (image.complete) {
+              finish();
+            }
           })
       );
 
@@ -102,7 +107,7 @@ export function LoadScreen({
         const elapsed =
           performance.now() - startedAt;
 
-        window.setTimeout(
+        const timer = window.setTimeout(
           resolve,
           Math.max(
             0,
@@ -110,6 +115,7 @@ export function LoadScreen({
               elapsed
           )
         );
+        activeTimers.push(timer);
       });
 
     const normalCompletion =
@@ -120,39 +126,68 @@ export function LoadScreen({
 
     const hardTimeout =
       new Promise<void>((resolve) => {
-        window.setTimeout(
+        const timer = window.setTimeout(
           resolve,
           HARD_TIMEOUT
         );
+        activeTimers.push(timer);
       });
+
+    // Smooth continuous progress bar interpolation (0% -> 100%)
+    let currentDisplay = 0;
+    let animFrameId: number;
+
+    const tickProgress = () => {
+      const elapsed = performance.now() - startedAt;
+      const timeRatio = Math.min(0.95, elapsed / MINIMUM_VISIBLE_TIME);
+      const assetRatio = CRITICAL_ASSETS.length > 0
+        ? loadedCount / CRITICAL_ASSETS.length
+        : 1;
+
+      // Blend elapsed animation time and asset preload ratio
+      const target = Math.max(timeRatio * 0.7 + assetRatio * 0.3, timeRatio);
+      currentDisplay += (target - currentDisplay) * 0.15;
+
+      if (!isCancelled) {
+        setProgress(Math.min(0.96, Math.max(0.04, currentDisplay)));
+        animFrameId = requestAnimationFrame(tickProgress);
+      }
+    };
+    animFrameId = requestAnimationFrame(tickProgress);
 
     Promise.race([
       normalCompletion,
       hardTimeout,
     ]).then(() => {
-      if (cancelled) return;
+      if (isCancelled) return;
 
+      cancelAnimationFrame(animFrameId);
       setProgress(1);
       setIsReady(true);
 
-      window.setTimeout(() => {
-        if (cancelled) return;
+      const holdTimer = window.setTimeout(() => {
+        if (isCancelled) return;
 
         setIsLeaving(true);
 
-        window.setTimeout(() => {
-          if (cancelled) return;
+        const fadeTimer = window.setTimeout(() => {
+          if (isCancelled) return;
 
           setIsVisible(false);
-          onComplete?.();
+          document.body.style.overflow = '';
+          onCompleteRef.current?.();
         }, FADE_DURATION);
+        activeTimers.push(fadeTimer);
       }, FINAL_HOLD);
+      activeTimers.push(holdTimer);
     });
 
     return () => {
-      cancelled = true;
+      isCancelled = true;
+      cancelAnimationFrame(animFrameId);
+      activeTimers.forEach((id) => window.clearTimeout(id));
     };
-  }, [onComplete]);
+  }, []);
 
   if (!isVisible) return null;
 

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { isRouteLive } from '@/config/page-release';
 import { ComingSoonPage } from '@/components/shared/ComingSoonPage';
 import ExperiencePageContent from '@/components/pages/ExperiencePageContent';
-import { LEARN_ITEMS, BUILD_ITEMS, CONNECT_ITEMS } from '@/data/experience-events';
+import { LEARN_ITEMS, BUILD_ITEMS, CONNECT_ITEMS } from '@/data/experience';
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://qiskitfallfest2026.srmap.edu.in';
 
